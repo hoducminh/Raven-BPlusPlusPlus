@@ -1,4 +1,4 @@
-name: Build
+name: Build Mod 1.8.9
 
 on:
   push:
@@ -11,20 +11,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Setup java
-        uses: actions/setup-java@v2
+
+      - name: Setup Java 8
+        uses: actions/setup-java@v4
         with:
-          distribution: "adopt"
+          distribution: "temurin" # Adopt đã đổi tên thành Temurin, dùng bản này ổn định hơn
           java-version: 8
           cache: "gradle"
-      - name: Build
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
         run: ./gradlew setupCiWorkspace clean build
         
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+      - name: Upload Mod Jar Only
+        uses: actions/upload-artifact@v4
         with:
-          name: static-site
-          path: build/libs/
+          name: Chunky-1.8.9 # Đổi tên hiển thị trên GitHub cho dễ nhận biết
+          # Lọc filter chỉ lấy file .jar chính thức, bỏ qua các file đính kèm như -sources hay -dev
+          path: build/libs/*[!(-sources|-dev|-devkit)].jar
